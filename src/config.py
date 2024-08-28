@@ -25,12 +25,12 @@ class Config(BaseConfig):
     DATABASES_DIR: Path = ROOT_PATH / 'database'  # 数据库路径
     HOST: str = "127.0.0.1"
     PORT: int = 12006
-    WORKERS: int = 4
     PRODUCTION: bool = False
     CLIENT_ID: str = ""
     CLIENT_SECRET: str = ""
-    BOT_TOKEN = ""
-    REDIRECT_URI = ""
+    BOT_TOKEN: str = ""
+    REDIRECT_URI: str = ""
+    LOG_LEVEL: int = 20
 
 
 _toml_file_path = os.path.join(ROOT_PATH, 'config.toml')

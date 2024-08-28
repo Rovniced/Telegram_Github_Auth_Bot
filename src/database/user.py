@@ -1,9 +1,7 @@
 import os
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Sequence, Tuple
+from datetime import datetime
 
-from sqlalchemy import select, Integer, String, create_engine, text, Result
+from sqlalchemy import select, Integer, create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncAttrs, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 
