@@ -133,11 +133,10 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
-/database/*.db
 /.idea/*
 *toml
 *.json
-/downloads/
 *__pycache__*
-*ffmpeg*
 /database/*
+*log
+config.toml
