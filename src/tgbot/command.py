@@ -25,7 +25,7 @@ class Command:
             await context.bot.send_message(chat_id=chat_id, text=f"您好,{update.effective_user.first_name}，欢迎加入本群！\n"
                                                                  f"本群暂未配置验证功能。")
             return
-        state = base64.b64encode(f"{user_id}#{chat_id}#{chat_data.path}".encode()).decode()
+        state = base64.b64encode(f"{user_id}#{chat_id}".encode()).decode()
         url = (f"https://github.com/login/oauth/authorize?client_id={Config.CLIENT_ID}&redirect_uri={Config.REDIRECT_URI}&scope=user"
                f"&state={state}")
         button = [[InlineKeyboardButton(text="点我进行验证", url=url)]]

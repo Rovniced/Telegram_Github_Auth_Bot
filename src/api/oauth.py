@@ -5,10 +5,14 @@ from fastapi import APIRouter, Response, Request, HTTPException
 
 __all__ = ["oauth_router"]
 
+from starlette.responses import HTMLResponse
+
 from telegram import Bot
 
 from src.config import Config
+from src.database.system import SystemOperate
 from src.database.user import UserOperate
+from src.util import generate_html
 
 oauth_router = APIRouter(prefix='/oauth', tags=["Github验证"])
 
@@ -27,16 +31,21 @@ async def get_file(request: Request) -> Response:
     state = query_params.get('state')
     try:
         if access_token := await get_access_token(code, state):
-            user_id, chat_id, rep_path = base64.b64decode(state).decode('utf-8').split("#")
-            if await user_is_star(access_token, rep_path):
+            user_id, chat_id = base64.b64decode(state).decode('utf-8').split("#")
+            chat_data = await SystemOperate.get_chat_verify_info(int(chat_id))
+            if chat_data is None:
+                return HTMLResponse(content=generate_html(False, "校验失败，群组未配置验证功能"), status_code=400)
+            if await user_is_star(access_token, chat_data.path):
                 await UserOperate.delete_user_info(int(user_id), int(chat_id))
-                return Response("校验成功，您可以退出此页面并返回群组了", status_code=200)
+                return HTMLResponse(content=generate_html(True, "校验成功，您可以退出此页面并返回群组了"), status_code=200)
             else:
-                return Response(f"校验失败，您未给{rep_path}项目点star，请给该项目点击star后验证", status_code=400)
+                return HTMLResponse(
+                    content=generate_html(False, f"校验失败，您未给https://github.com/{chat_data.path}项目点star，请给该项目点击star后验证"),
+                    status_code=300)
         else:
-            raise HTTPException(401, "校验失败，access_token获取失败，请联系开发者")
+            return HTMLResponse(content=generate_html(False, "校验失败，access_token获取失败，请联系开发者"), status_code=401)
     except AuthException as e:
-        raise HTTPException(500, f"校验发生错误，请联系开发者 {e}")
+        return HTMLResponse(content=generate_html(False, "校验发生错误，请联系开发者 {e}"), status_code=500)
 
 
 async def get_access_token(code: str, state: str) -> str:
