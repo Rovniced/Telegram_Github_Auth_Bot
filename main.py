@@ -21,9 +21,6 @@ LOGGING_CONFIG = {
         'default': {
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
-        'hypercorn': {
-            'format': '%(asctime)s - %(message)s',
-        },
     },
     'handlers': {
         'file': {
@@ -37,31 +34,7 @@ LOGGING_CONFIG = {
             'class': 'logging.StreamHandler',
             'formatter': 'default',
             'stream': sys.stdout,
-        },
-        'access_logfile': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'access.log',
-            'formatter': 'hypercorn',
-            'maxBytes': 10485760,
-            'backupCount': 5,
-        },
-    },
-    'loggers': {
-        'uvicorn': {
-            'handlers': ['console', 'file'],
-            'level': Config.LOG_LEVEL,
-            'propagate': False,
-        },
-        'uvicorn.access': {
-            'handlers': ['access_logfile'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'hypercorn.access': {
-            'handlers': ['access_logfile'],
-            'level': 'INFO',
-            'propagate': False,
-        },
+        }
     },
     'root': {
         'handlers': ['console', 'file'],
