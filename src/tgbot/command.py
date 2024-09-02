@@ -56,7 +56,7 @@ class Command:
         # 对用户设置禁言
         await context.bot.restrict_chat_member(chat_id=chat_id, user_id=user_id, permissions={"can_send_messages": False,
                                                                                               "can_send_polls ": False,
-                                                                                              "can_send_other_messages": False,})
+                                                                                              "can_send_other_messages": False})
         await UserOperate.add_user_verify_info(user_id, chat_id)
         # 设置定时任务，5分钟后未通过直接踢出
         await sleep(60 * 5)
