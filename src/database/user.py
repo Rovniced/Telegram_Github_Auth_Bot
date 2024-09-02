@@ -40,7 +40,7 @@ class UserOperate:
         :param chat_id: 群组id
         """
         async with UserFactory() as session:
-            data = await session.execute(select(UserFactory).filter_by(user_id=user_id, chat_id=chat_id).limit(1))
+            data = await session.execute(select(UserData).filter_by(user_id=user_id, chat_id=chat_id).limit(1))
             return data.scalar_one_or_none()
 
     @staticmethod
