@@ -46,6 +46,7 @@ def generate_html(status: bool, text: str) -> str:
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                padding: 20px;
             }}
             .checkmark, .cross {{
                 width: 56px;
@@ -93,6 +94,10 @@ def generate_html(status: bool, text: str) -> str:
                 font-size: 24px;
                 margin-top: 20px;
                 color: {color};
+                word-wrap: break-word;
+                word-break: break-all;
+                width: 90%;
+                text-align: center;
             }}
         </style>
     </head>
