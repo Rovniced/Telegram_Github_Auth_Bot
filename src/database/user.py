@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from sqlalchemy import select, Integer, create_engine, text
+from sqlalchemy import select, Integer, create_engine, text, delete
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncAttrs, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 
@@ -40,7 +40,7 @@ class UserOperate:
         :param chat_id: 群组id
         """
         async with UserFactory() as session:
-            data = await session.execute(select(UserFactory).filter_by(user_id=user_id, chat_id=chat_id).limit(1))
+            data = await session.execute(select(UserData).filter_by(user_id=user_id, chat_id=chat_id).limit(1))
             return data.scalar_one_or_none()
 
     @staticmethod
@@ -71,8 +71,5 @@ class UserOperate:
         """
         async with UserFactory() as session:
             async with session.begin():
-                data = await session.execute(select(UserFactory).filter_by(user_id=user_id, chat_id=chat_id).limit(1))
-                if data.scalar_one_or_none():
-                    await session.delete(data)
-                    return True
-                return False
+                await session.execute(delete(UserData).filter_by(user_id=user_id, chat_id=chat_id))
+            return True

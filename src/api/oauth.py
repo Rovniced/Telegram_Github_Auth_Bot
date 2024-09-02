@@ -31,12 +31,15 @@ async def get_file(request: Request) -> Response:
     state = query_params.get('state')
     try:
         if access_token := await get_access_token(code, state):
-            user_id, chat_id = base64.b64decode(state).decode('utf-8').split("#")
-            chat_data = await SystemOperate.get_chat_verify_info(int(chat_id))
+            user_id, chat_id = map(int, base64.b64decode(state).decode('utf-8').split("#"))
+            chat_data = await SystemOperate.get_chat_verify_info(chat_id)
             if chat_data is None:
                 return HTMLResponse(content=generate_html(False, "校验失败，群组未配置验证功能"), status_code=400)
             if await user_is_star(access_token, chat_data.path):
-                await UserOperate.delete_user_info(int(user_id), int(chat_id))
+                await UserOperate.delete_user_info(user_id, chat_id)
+                await tg_bot.restrict_chat_member(chat_id=chat_id, user_id=user_id, permissions={"can_send_messages": True,
+                                                                                                 "can_send_polls ": True,
+                                                                                                 "can_send_other_messages": True})
                 return HTMLResponse(content=generate_html(True, "校验成功，您可以退出此页面并返回群组了"), status_code=200)
             else:
                 return HTMLResponse(
