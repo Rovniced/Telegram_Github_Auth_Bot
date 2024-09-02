@@ -37,9 +37,9 @@ async def get_file(request: Request) -> Response:
                 return HTMLResponse(content=generate_html(False, "校验失败，群组未配置验证功能"), status_code=400)
             if await user_is_star(access_token, chat_data.path):
                 await UserOperate.delete_user_info(user_id, chat_id)
-                await tg_bot.restrict_chat_member(chat_id=chat_id, user_id=user_id, permissions={"can_send_messages": False,
-                                                                                                 "can_send_polls ": False,
-                                                                                                 "can_send_other_messages": False})
+                await tg_bot.restrict_chat_member(chat_id=chat_id, user_id=user_id, permissions={"can_send_messages": True,
+                                                                                                 "can_send_polls ": True,
+                                                                                                 "can_send_other_messages": True})
                 return HTMLResponse(content=generate_html(True, "校验成功，您可以退出此页面并返回群组了"), status_code=200)
             else:
                 return HTMLResponse(
