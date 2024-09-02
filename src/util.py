@@ -1,3 +1,9 @@
+from telegram import Update
+from telegram.ext import CallbackContext, ConversationHandler
+
+from src.database.system import SystemOperate, SystemData
+
+
 def generate_html(status: bool, text: str) -> str:
     if status:
         svg_content = f"""
@@ -25,7 +31,7 @@ def generate_html(status: bool, text: str) -> str:
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>FastAPI Status Page</title>
+        <title>Telegram Github Auth Bot</title>
         <style>
             body {{
                 display: flex;
@@ -97,3 +103,22 @@ def generate_html(status: bool, text: str) -> str:
     </body>
     </html>
     """
+
+
+async def bind_repo(update: Update, context: CallbackContext):
+    chat_id = int(context.user_data.get('bind', ''))
+    if chat_id == '':
+        await update.message.reply_text("发生错误")
+    repo_path = update.effective_message.text
+    if "http" in repo_path:
+        repo_path = repo_path.replace("https://github.com/", "")
+    chat_data = await SystemOperate.get_chat_verify_info(chat_id)
+    if chat_data:
+        chat_data.path = repo_path
+        await SystemOperate.update_chat_verify_info(chat_data)
+        await update.effective_message.reply_text(f"当前群组验证仓库为：{chat_data.path}")
+        return ConversationHandler.END
+    else:
+        chat_data = await SystemOperate.add_chat_verify_info(chat_id, repo_path)
+        await update.effective_message.reply_text(f"当前群组验证仓库为：{chat_data.path}")
+        return ConversationHandler.END

@@ -8,11 +8,12 @@ from fastapi.responses import JSONResponse
 from hypercorn.asyncio import serve
 from hypercorn.config import Config as HypercornConfig
 from telegram import Update
-from telegram.ext import CommandHandler, Application, ChatJoinRequestHandler
+from telegram.ext import CommandHandler, Application, ChatJoinRequestHandler, ConversationHandler, MessageHandler, filters
 
 from src.api import oauth_router
 from src.config import Config
 from src.tgbot.command import Command
+from src.util import bind_repo
 
 LOGGING_CONFIG = {
     'version': 1,
@@ -50,8 +51,20 @@ def run_bot():
     logging.info("Bot process starting...")
 
     application = Application.builder().token(Config.BOT_TOKEN).build()
-    application.add_handler(CommandHandler("start", Command.start))
+    # application.add_handler(CommandHandler("start", Command.start))
+    application.add_handler(CommandHandler("bind", Command.bind))
     application.add_handler(ChatJoinRequestHandler(Command.join))
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', Command.start)],
+        states={
+            0: [MessageHandler(filters.TEXT & ~filters.COMMAND, bind_repo)]
+        },
+        fallbacks=[CommandHandler('cancel', Command.cancel)]
+    )
+
+    application.add_handler(conv_handler)
+
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
