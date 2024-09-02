@@ -63,6 +63,10 @@ class Command:
         user_data = await UserOperate.get_user_info(user_id, chat_id)
         if user_data is None:
             return
+        user_data.failed_times += 1
+        await UserOperate.update_user_info(user_data)
+        if user_data.failed_times >= 5:
+            await context.bot.banChatMember(chat_id=chat_id, user_id=user_id)
         await context.bot.kick_chat_member(chat_id=chat_id, user_id=user_id)
 
     @staticmethod
