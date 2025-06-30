@@ -2,6 +2,7 @@ import base64
 from asyncio import sleep
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.constants import ChatMemberStatus
 from telegram.ext import ContextTypes, ConversationHandler
 
 from src.config import Config
@@ -20,7 +21,6 @@ class Command:
             "请确保您是群组的管理员，并且已配置好验证仓库。"
             "(本bot仍在开发阶段，可能存在一些问题)\n"
         )
-
 
     @staticmethod
     async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int | None:
@@ -49,7 +49,8 @@ class Command:
     async def member_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         chat_member_update = update.chat_member
         try:
-            was_member, is_member = chat_member_update.old_chat_member.is_member, chat_member_update.new_chat_member.is_member
+            was_member = chat_member_update.old_chat_member.status == ChatMemberStatus.MEMBER
+            is_member = chat_member_update.new_chat_member.status == ChatMemberStatus.MEMBER
             if not was_member and is_member:
                 await Command.verify_update(update, context)
         except AttributeError:

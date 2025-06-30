@@ -54,7 +54,7 @@ def run_bot():
     application = Application.builder().token(Config.BOT_TOKEN).build()
     application.add_handler(CommandHandler("help", Command.help))
     application.add_handler(CommandHandler("bind", Command.bind))
-    application.add_handler(ChatMemberHandler(Command.member_update,ChatMemberHandler.CHAT_MEMBER))
+    application.add_handler(ChatMemberHandler(Command.member_update, ChatMemberHandler.CHAT_MEMBER))
     application.add_handler(ChatJoinRequestHandler(Command.join))
 
     conv_handler = ConversationHandler(
