@@ -8,7 +8,8 @@ from fastapi.responses import JSONResponse
 from hypercorn.asyncio import serve
 from hypercorn.config import Config as HypercornConfig
 from telegram import Update
-from telegram.ext import CommandHandler, Application, ChatJoinRequestHandler, ConversationHandler, MessageHandler, filters
+from telegram.ext import CommandHandler, Application, ChatJoinRequestHandler, ConversationHandler, MessageHandler, \
+    filters, ChatMemberHandler
 
 from src.api import oauth_router
 from src.config import Config
@@ -51,8 +52,9 @@ def run_bot():
     logging.info("Bot process starting...")
 
     application = Application.builder().token(Config.BOT_TOKEN).build()
-    # application.add_handler(CommandHandler("start", Command.start))
+    application.add_handler(CommandHandler("help", Command.help))
     application.add_handler(CommandHandler("bind", Command.bind))
+    application.add_handler(ChatMemberHandler(Command.member_update,ChatMemberHandler.CHAT_MEMBER))
     application.add_handler(ChatJoinRequestHandler(Command.join))
 
     conv_handler = ConversationHandler(
