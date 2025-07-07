@@ -47,19 +47,15 @@ class Command:
 
     @staticmethod
     async def member_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        print("member update")
         chat_member_update = update.chat_member
-        try:
-            old = chat_member_update.old_chat_member.status
-            new = chat_member_update.new_chat_member.status
-            was_member = old == ChatMemberStatus.MEMBER
-            is_member = new == ChatMemberStatus.MEMBER or new == ChatMemberStatus.RESTRICTED
-            await update.message.delete()
-            if not was_member and is_member:
-                # 用户加入群组
-                await update.message.delete()
-                await Command.verify_update(update, context)
-        except AttributeError:
-            return
+        old = chat_member_update.old_chat_member.status
+        new = chat_member_update.new_chat_member.status
+        was_member = old == ChatMemberStatus.MEMBER
+        is_member = new == ChatMemberStatus.MEMBER or new == ChatMemberStatus.RESTRICTED
+        if not was_member and is_member:
+            # 用户加入群组
+            await Command.verify_update(update, context)
 
     @staticmethod
     async def join(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
