@@ -20,7 +20,6 @@ class UserData(UserDatabaseModel):
     chat_id: Mapped[int] = mapped_column(Integer, index=True, )  # 群组id
     verify_time: Mapped[int] = mapped_column(Integer, )  # 验证开始时间戳
     failed_times: Mapped[int] = mapped_column(Integer, )  # 验证失败次数
-    msg_id: Mapped[int] = mapped_column(Integer, nullable=True)  # 验证消息id
 
 
 os.makedirs(Config.DATABASES_DIR, exist_ok=True)
@@ -55,13 +54,13 @@ class UserOperate:
                 await session.merge(data)
 
     @staticmethod
-    async def add_user_verify_info(user_id: int, chat_id: int, msg_id: int) -> UserData:
+    async def add_user_verify_info(user_id: int, chat_id: int) -> UserData:
         """
         增加用户的验证信息
         """
         async with UserFactory() as session:
             async with session.begin():
-                data = UserData(user_id=user_id, chat_id=chat_id, failed_times=1, msg_id=msg_id,
+                data = UserData(user_id=user_id, chat_id=chat_id, failed_times=1,
                                 verify_time=int(datetime.now().timestamp()))
             session.add(data)
             return data

@@ -36,9 +36,6 @@ async def code_verify(request: Request) -> Response:
             if chat_data is None:
                 return HTMLResponse(content=generate_html(False, "校验失败，群组未配置验证功能"), status_code=400)
             if await user_is_star(access_token, chat_data.path):
-                user_data = await UserOperate.get_user_info(user_id, chat_id)
-                print("del", chat_id, user_data)
-                await tg_bot.deleteMessage(chat_id=chat_id, message_id=user_data.msg_id)
                 await UserOperate.delete_user_info(user_id, chat_id)
                 await tg_bot.restrict_chat_member(chat_id=chat_id, user_id=user_id,
                                                   permissions={"can_send_messages": True,

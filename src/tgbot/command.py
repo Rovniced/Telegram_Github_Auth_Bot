@@ -1,4 +1,5 @@
 import base64
+import time
 from asyncio import sleep
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -91,13 +92,17 @@ class Command:
                                                permissions={"can_send_messages": False,
                                                             "can_send_polls ": False,
                                                             "can_send_other_messages": False})
-        await UserOperate.add_user_verify_info(user_id, chat_id, join_msg.message_id)
-        # 未通过直接踢出
-        await sleep(60 * 3)
+        await UserOperate.add_user_verify_info(user_id, chat_id)
+        start_time = time.time()
+        while time.time() - start_time < 60 * 3:
+            user_data = await UserOperate.get_user_info(user_id, chat_id)
+            if user_data is None:
+                await join_msg.delete()
+                return
+            await sleep(3)
         await join_msg.delete()
         user_data = await UserOperate.get_user_info(user_id, chat_id)
         if user_data is None:
-            await context.bot.ban_chat_member(chat_id=chat_id, user_id=user_id)
             return
         user_data.failed_times += 1
         await UserOperate.update_user_info(user_data)
