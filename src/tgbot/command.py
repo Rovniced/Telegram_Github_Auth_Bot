@@ -94,6 +94,7 @@ class Command:
                                                             "can_send_other_messages": False})
         await UserOperate.add_user_verify_info(user_id, chat_id)
         start_time = time.time()
+        await sleep(2)
         while time.time() - start_time < 60 * 3:
             user_data = await UserOperate.get_user_info(user_id, chat_id)
             if user_data is None:

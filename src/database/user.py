@@ -62,7 +62,7 @@ class UserOperate:
             async with session.begin():
                 data = UserData(user_id=user_id, chat_id=chat_id, failed_times=1,
                                 verify_time=int(datetime.now().timestamp()))
-            session.add(data)
+                session.add(data)
             return data
 
     @staticmethod
