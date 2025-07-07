@@ -91,7 +91,7 @@ class Command:
                                                permissions={"can_send_messages": False,
                                                             "can_send_polls ": False,
                                                             "can_send_other_messages": False})
-        await UserOperate.add_user_verify_info(user_id, chat_id)
+        await UserOperate.add_user_verify_info(user_id, chat_id, join_msg.message_id)
         # 未通过直接踢出
         await sleep(60 * 3)
         await join_msg.delete()

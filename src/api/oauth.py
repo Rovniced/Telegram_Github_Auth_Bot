@@ -25,7 +25,7 @@ tg_bot = Bot(token=Config.BOT_TOKEN)
 
 
 @oauth_router.get("/code", summary='code', description='code')
-async def get_file(request: Request) -> Response:
+async def code_verify(request: Request) -> Response:
     query_params = request.query_params
     code = query_params.get('code')
     state = query_params.get('state')
@@ -36,17 +36,24 @@ async def get_file(request: Request) -> Response:
             if chat_data is None:
                 return HTMLResponse(content=generate_html(False, "校验失败，群组未配置验证功能"), status_code=400)
             if await user_is_star(access_token, chat_data.path):
+                user_data = await UserOperate.get_user_info(user_id, chat_id)
+                print("del", chat_id, user_data)
+                await tg_bot.deleteMessage(chat_id=chat_id, message_id=user_data.msg_id)
                 await UserOperate.delete_user_info(user_id, chat_id)
-                await tg_bot.restrict_chat_member(chat_id=chat_id, user_id=user_id, permissions={"can_send_messages": True,
-                                                                                                 "can_send_polls ": True,
-                                                                                                 "can_send_other_messages": True})
-                return HTMLResponse(content=generate_html(True, "校验成功，您可以退出此页面并返回群组了"), status_code=200)
+                await tg_bot.restrict_chat_member(chat_id=chat_id, user_id=user_id,
+                                                  permissions={"can_send_messages": True,
+                                                               "can_send_polls ": True,
+                                                               "can_send_other_messages": True})
+                return HTMLResponse(content=generate_html(True, "校验成功，您可以退出此页面并返回群组了"),
+                                    status_code=200)
             else:
                 return HTMLResponse(
-                    content=generate_html(False, f"校验失败，您未给https://github.com/{chat_data.path}项目点star，请给该项目点击star后验证"),
+                    content=generate_html(False,
+                                          f"校验失败，您未给https://github.com/{chat_data.path}项目点star，请给该项目点击star后验证"),
                     status_code=300)
         else:
-            return HTMLResponse(content=generate_html(False, "校验失败，access_token获取失败，请联系开发者"), status_code=401)
+            return HTMLResponse(content=generate_html(False, "校验失败，access_token获取失败，请联系开发者"),
+                                status_code=401)
     except AuthException as e:
         return HTMLResponse(content=generate_html(False, "校验发生错误，请联系开发者 {e}"), status_code=500)
 
