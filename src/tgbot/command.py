@@ -52,7 +52,12 @@ class Command:
             was_member = chat_member_update.old_chat_member.status == ChatMemberStatus.MEMBER
             is_member = chat_member_update.new_chat_member.status == ChatMemberStatus.MEMBER
             if not was_member and is_member:
+                # 用户加入群组
+                await update.message.delete()
                 await Command.verify_update(update, context)
+            elif was_member and not is_member:
+                # 用户离开群组
+                await update.message.delete()
         except AttributeError:
             return
 
@@ -92,8 +97,8 @@ class Command:
                                                             "can_send_other_messages": False})
         await UserOperate.add_user_verify_info(user_id, chat_id)
         # 未通过直接踢出
-        await join_msg.delete()
         await sleep(60 * 3)
+        await join_msg.delete()
         user_data = await UserOperate.get_user_info(user_id, chat_id)
         if user_data is None:
             await context.bot.ban_chat_member(chat_id=chat_id, user_id=user_id)
