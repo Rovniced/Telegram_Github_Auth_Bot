@@ -49,15 +49,15 @@ class Command:
     async def member_update(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         chat_member_update = update.chat_member
         try:
-            was_member = chat_member_update.old_chat_member.status == ChatMemberStatus.MEMBER
-            is_member = chat_member_update.new_chat_member.status == ChatMemberStatus.MEMBER
+            old = chat_member_update.old_chat_member.status
+            new = chat_member_update.new_chat_member.status
+            was_member = old == ChatMemberStatus.MEMBER
+            is_member = new == ChatMemberStatus.MEMBER or new == ChatMemberStatus.RESTRICTED
+            await update.message.delete()
             if not was_member and is_member:
                 # 用户加入群组
                 await update.message.delete()
                 await Command.verify_update(update, context)
-            elif was_member and not is_member:
-                # 用户离开群组
-                await update.message.delete()
         except AttributeError:
             return
 

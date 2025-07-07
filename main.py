@@ -14,6 +14,7 @@ from telegram.ext import CommandHandler, Application, ChatJoinRequestHandler, Co
 from src.api import oauth_router
 from src.config import Config
 from src.tgbot.command import Command
+from src.tgbot.message import delete_service_messages
 from src.util import bind_repo
 
 LOGGING_CONFIG = {
@@ -55,6 +56,8 @@ def run_bot():
     application.add_handler(CommandHandler("help", Command.help))
     application.add_handler(CommandHandler("bind", Command.bind))
     application.add_handler(ChatMemberHandler(Command.member_update, ChatMemberHandler.CHAT_MEMBER))
+    application.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, delete_service_messages))
+    application.add_handler(MessageHandler(filters.StatusUpdate.LEFT_CHAT_MEMBER, delete_service_messages))
     application.add_handler(ChatJoinRequestHandler(Command.join))
 
     conv_handler = ConversationHandler(
